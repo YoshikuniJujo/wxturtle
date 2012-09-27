@@ -1,4 +1,4 @@
-module Graphics.X11.Turtle.Layers(
+module Graphics.UI.WX.Turtle.Layers(
 	-- * types
 	Layers,
 	Layer,

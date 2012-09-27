@@ -1,4 +1,4 @@
-module Graphics.X11.Turtle.Move(
+module Graphics.UI.WX.Turtle.Move(
 	-- * types
 	Field,
 	Coordinates(..),
@@ -15,9 +15,7 @@ module Graphics.X11.Turtle.Move(
 	-- * draws
 	forkField,
 	flushField,
-	addLayer,
 	clearLayer,
-	addCharacter,
 	clearCharacter,
 	moveTurtle,
 
@@ -27,18 +25,20 @@ module Graphics.X11.Turtle.Move(
 	ondrag,
 	onmotion,
 	onkeypress,
-	ontimer
+	ontimer,
+	addLayer,
+	addCharacter
 ) where
 
-import Graphics.X11.Turtle.State(TurtleState(..), makeShape)
-import Graphics.X11.Turtle.Field(
+import Graphics.UI.WX.Turtle.State(TurtleState(..), makeShape)
+import Graphics.UI.WX.Turtle.Field(
 	Field, Layer, Character, Coordinates(..),
 	openField, closeField, waitField, coordinates, topleft, center,
-	fieldSize, forkField, flushField, addLayer, clearLayer,
-	addCharacter, clearCharacter,
+	fieldSize, forkField, flushField, clearLayer,
+	clearCharacter, addLayer, addCharacter,
 	onclick, onrelease, ondrag, onmotion, onkeypress, ontimer,
 	fieldColor, drawLine, fillRectangle, fillPolygon, writeString,
-	drawImage, undoLayer, drawCharacter, drawCharacterAndLine)
+	drawImage, undoField, undoLayer, drawCharacter, drawCharacterAndLine)
 import Text.XML.YJSVG(SVG(..), Position(..))
 import qualified Text.XML.YJSVG as S(topleft)
 
@@ -57,7 +57,8 @@ moveTurtle f c l t0 t1 = do
 	when (undo t1) $ fl $ do
 		when (clear t0) redraw
 		when (isJust $ draw t0) $ do
-			unlessM (undoLayer l) $ clearLayer l >> redraw
+--			unlessM (undoLayer l) $ clearLayer l >> redraw
+			undoField f
 			when (visible t1) $ drawTtl (direction t0) $ position t0
 	when (visible t1) $ do
 		forM_ (directions t0 t1) $ \dir -> fl $

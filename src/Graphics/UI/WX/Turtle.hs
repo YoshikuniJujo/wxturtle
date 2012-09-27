@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE RankNTypes #-}
 
-module Graphics.X11.Turtle(
+module Graphics.UI.WX.Turtle(
 	-- * meta data
 	xturtleVersion,
 
@@ -92,12 +92,12 @@ module Graphics.X11.Turtle(
 	windowHeight
 ) where
 
-import Graphics.X11.Turtle.Data(shapeTable, speedTable)
-import Graphics.X11.Turtle.State(
+import Graphics.UI.WX.Turtle.Data(shapeTable, speedTable)
+import Graphics.UI.WX.Turtle.State(
 	TurtleState, direction, visible, undonum, drawed, polyPoints)
-import qualified Graphics.X11.Turtle.State as S(position, degrees, pendown)
-import Graphics.X11.Turtle.Input(TurtleInput(..), turtleSeries)
-import Graphics.X11.Turtle.Move(
+import qualified Graphics.UI.WX.Turtle.State as S(position, degrees, pendown)
+import Graphics.UI.WX.Turtle.Input(TurtleInput(..), turtleSeries)
+import Graphics.UI.WX.Turtle.Move(
 	Field, Coordinates(..), openField, closeField, waitField,
 	topleft, center, coordinates, fieldSize, forkField, flushField,
 	addLayer, clearLayer, addCharacter, clearCharacter, moveTurtle,

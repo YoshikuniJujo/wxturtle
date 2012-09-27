@@ -50,30 +50,6 @@ module Graphics.X11.Turtle.XTools(
 	xK_VoidSymbol,
 ) where
 
-import Graphics.X11(
-	Display, Drawable, Window, Pixmap, GC, Atom, Point(..), Position,
-	Dimension, XEventPtr,
-	initThreads, flush, supportsLocale, setLocaleModifiers,
-	connectionNumber, openDisplay, closeDisplay, internAtom,
-	createSimpleWindow, destroyWindow, mapWindow, getGeometry,
-	createGC, createPixmap, rootWindow, defaultScreen,
-	defaultScreenOfDisplay, defaultVisual, defaultColormap, defaultDepth,
-	whitePixel, blackPixel,
-	copyArea, fillRectangle, fillPolygon, drawLine, drawPoint,
-	nonconvex, coordModeOrigin,
-	setLineAttributes, lineSolid, capRound, joinRound, setForeground,
-	allocNamedColor, color_pixel,
-	setWMProtocols, selectInput, allocaXEvent, pending, nextEvent,
-	exposureMask, keyPressMask, buttonPressMask, buttonReleaseMask,
-	pointerMotionMask, buttonPress, buttonRelease, xK_VoidSymbol)
-import Graphics.X11.Xlib.Extras(Event(..), getEvent)
-import Graphics.X11.Xft(
-	xftDrawCreate, xftFontOpen, withXftColorValue, withXftColorName,
-	xftDrawString)
-import Graphics.X11.Xrender(XRenderColor(..))
-import Graphics.X11.Xim(
-	XIC, XNInputStyle(..), openIM, createIC, getICValue, filterEvent,
-	utf8LookupString)
 import Graphics.Imlib(
 	ImlibLoadError(..), loadImageWithErrorReturn, contextSetImage,
 	imageGetWidth, imageGetHeight, imageGetData, createCroppedScaledImage)
@@ -82,7 +58,6 @@ import Numeric(showFFloat)
 import Control.Monad(forM_, replicateM)
 import Control.Monad.Tools(unlessM)
 import Control.Concurrent(ThreadId, forkIO, threadWaitRead)
-import System.Locale.SetLocale(Category(..), setLocale)
 import System.Posix.Types(Fd(..))
 import Data.Word(Word32)
 import Data.Bits((.|.), shift)

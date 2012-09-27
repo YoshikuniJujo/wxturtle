@@ -1,6 +1,6 @@
-module Graphics.X11.Turtle.Input(TurtleInput(..), turtleSeries) where
+module Graphics.UI.WX.Turtle.Input(TurtleInput(..), turtleSeries) where
 
-import Graphics.X11.Turtle.State(TurtleState(..), initTurtleState, makeShape)
+import Graphics.UI.WX.Turtle.State(TurtleState(..), initTurtleState, makeShape)
 import Text.XML.YJSVG(SVG(..), Color(..), Position(..))
 
 --------------------------------------------------------------------------------

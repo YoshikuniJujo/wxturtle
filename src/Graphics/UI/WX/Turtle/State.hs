@@ -1,4 +1,4 @@
-module Graphics.X11.Turtle.State(
+module Graphics.UI.WX.Turtle.State(
 	TurtleState(..), initTurtleState, makeShape) where
 
 import Text.XML.YJSVG(Position(..), SVG(Fill), Color(RGB))
