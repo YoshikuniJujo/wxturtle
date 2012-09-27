@@ -1,6 +1,6 @@
 module Graphics.UI.WX.Turtle.Field(
 	-- * types and classes
-	Field,
+	Field(fFrame),
 	Layer,
 	Character,
 	Coordinates(..),
@@ -48,7 +48,7 @@ module Graphics.UI.WX.Turtle.Field(
 import Graphics.UI.WX(
 	on, command, Prop(..), text, button, frame, layout, widget, set, panel,
 	Frame, Panel, minsize, sz, column, circle, paint, Point2(..), Point,
-	line, repaint, DC, Rect, dcClear
+	line, repaint, DC, Rect, dcClear, polygon, red, green, brushColor, penColor
  )
 import qualified Graphics.UI.WX as WX
 
@@ -167,6 +167,7 @@ drawLine f l w c p q = do
 	repaint $ fPanel f
 	where
 	act = \dc rect -> do 
+		set dc [penColor := red]
 		line dc (positionToPoint p) (positionToPoint q) []
 
 {- addDraw l (do
@@ -181,7 +182,7 @@ drawLine f l w c p q = do
 -}
 
 positionToPoint :: Position -> Point
-positionToPoint (Center x y) = Point (round x) (round y)
+positionToPoint (Center x y) = Point (round x + 100) (round y + 100)
 
 writeString :: Field -> Layer -> String -> Double -> Color -> Position ->
 	String -> IO ()
@@ -209,7 +210,10 @@ drawCharacterAndLine ::	Field -> Character -> Color -> [Position] ->
 drawCharacterAndLine f ch clr sh lw p q = do
 	putStrLn $ "drawCharacterAndLine" ++ show p ++ " : " ++ show q
 	writeIORef (fAction f) $ \dc rect -> do
+		set dc [brushColor := green, penColor := red ]
 		line dc (positionToPoint p) (positionToPoint q) []
+		polygon dc (map positionToPoint sh) []
+	repaint $ fPanel f
 		
 {-
 	atomicModifyIORef_ (fAction f) $ \f dc rect -> do
