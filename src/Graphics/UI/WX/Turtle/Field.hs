@@ -48,7 +48,8 @@ module Graphics.UI.WX.Turtle.Field(
 import Graphics.UI.WX(
 	on, command, Prop(..), text, button, frame, layout, widget, set, panel,
 	Frame, Panel, minsize, sz, column, circle, paint, Point2(..), Point,
-	line, repaint, DC, Rect, dcClear, polygon, red, green, brushColor, penColor
+	line, repaint, DC, Rect, dcClear, polygon, red, green, brushColor, penColor,
+	rgb
  )
 import qualified Graphics.UI.WX as WX
 
@@ -83,6 +84,9 @@ data Field = Field{
 	fCharacter :: Character,
 	fCoordinates :: Coordinates,
 
+	fPenColor :: (Int, Int, Int),
+	fDrawColor :: (Int, Int, Int),
+
 	fLayers :: IORef Layers
  }
 
@@ -112,6 +116,7 @@ openField = do
 			fAction = act,
 			fActions = acts,
 			fCoordinates = CoordCenter,
+			fPenColor = (0, 0, 0),
 			fLayers = layers
 		 }
 	set p [on paint := \dc rct -> do
@@ -167,8 +172,14 @@ drawLine f l w c p q = do
 	repaint $ fPanel f
 	where
 	act = \dc rect -> do 
-		set dc [penColor := red]
+		set dc [penColor := colorToWX c]
 		line dc (positionToPoint p) (positionToPoint q) []
+
+getPenColor :: Field -> WX.Color
+getPenColor Field{fPenColor = (r, g, b)} = rgb r g b
+
+colorToWX :: Color -> WX.Color
+colorToWX (RGB{colorRed = r, colorGreen = g, colorBlue = b}) = rgb r g b
 
 {- addDraw l (do
 	atomicModifyIORef_ (fAction f) $ \f dc rect -> do
@@ -210,7 +221,7 @@ drawCharacterAndLine ::	Field -> Character -> Color -> [Position] ->
 drawCharacterAndLine f ch clr sh lw p q = do
 	putStrLn $ "drawCharacterAndLine" ++ show p ++ " : " ++ show q
 	writeIORef (fAction f) $ \dc rect -> do
-		set dc [brushColor := green, penColor := red ]
+		set dc [brushColor := green, penColor := colorToWX clr ]
 		line dc (positionToPoint p) (positionToPoint q) []
 		polygon dc (map positionToPoint sh) []
 	repaint $ fPanel f

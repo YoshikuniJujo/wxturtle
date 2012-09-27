@@ -75,7 +75,7 @@ nextTurtle t (Goto pos) = (reset t){position = pos,
 nextTurtle t (RotateRad dir) = (reset t){direction = dir}
 nextTurtle t@TurtleState{pencolor = clr} (Dot sz) = reset t `set`
 	Just (Rect (position t) sz sz 0 clr clr)
-nextTurtle t@TurtleState{pencolor = clr} Stamp = reset t `set`
+nextTurtle t@TurtleState{pencolor = clr, fillcolor = fclr} Stamp = reset t `set`
 	Just (Polyline (makeShape t (direction t) (position t)) clr clr 0)
 nextTurtle t@TurtleState{pencolor = clr} (Write fnt sz str) = reset t `set`
 	Just (Text (position t) sz clr fnt str)

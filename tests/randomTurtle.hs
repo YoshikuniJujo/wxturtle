@@ -15,7 +15,7 @@ main = start $ do
 	t <- newTurtle f
 	preprocess t
 	(x0, y0) <- position t
-	timer (fFrame f) [interval := 100, on command := draw t x0 y0]
+	timer (fFrame f) [interval := 150, on command := draw t x0 y0]
 
 randomWord8 :: IO Word8
 randomWord8 = fmap fromIntegral $ (randomRIO (0, 255) :: IO Int)
