@@ -1,3 +1,5 @@
+{-# LANGUAGE DoRec #-}
+
 module Graphics.UI.WX.Turtle.Field(
 	-- * types and classes
 	Field(fFrame),
@@ -49,7 +51,7 @@ import Graphics.UI.WX(
 	on, command, Prop(..), text, button, frame, layout, widget, set, panel,
 	Frame, Panel, minsize, sz, column, circle, paint, Point2(..), Point,
 	line, repaint, DC, Rect, dcClear, polygon, red, green, brushColor, penColor,
-	rgb
+	rgb, row, textEntry, processEnter, get, fill, size, Size2D(..), resize
  )
 import qualified Graphics.UI.WX as WX
 
@@ -87,6 +89,8 @@ data Field = Field{
 	fPenColor :: (Int, Int, Int),
 	fDrawColor :: (Int, Int, Int),
 
+	fSize :: IORef (Double, Double),
+
 	fLayers :: IORef Layers
  }
 
@@ -101,7 +105,14 @@ openField = do
 	fr <- frame [text := "turtle"]
 	p <- panel fr []
 	quit <- button fr [text := "Quit", on command := WX.close fr]
-	set fr [layout := column 5 [widget quit, minsize (sz 300 300) $ widget p ]]
+	rec input <- textEntry fr [
+		processEnter := True,
+		on command := do
+			putStrLn =<< get input text
+			set input [text := ""]]
+	set fr [layout := column 5 [
+		fill $ minsize (sz 300 300) $ widget p,
+		row 5 [fill $ widget input, widget quit] ]]
 	act <- newIORef $ \dc rct -> circle dc (Point 40 25) 25 []
 	acts <- newIORef []
 	layers <- newLayers 50 (return ())
@@ -110,6 +121,10 @@ openField = do
 		(return ())
 --		(writeIORef act (\dc rect -> dcClear dc) >> repaint p)
 --		(return ())
+	Size x y <- get p size
+	print x
+	print y
+	sz <- newIORef (fromIntegral x, fromIntegral y)
 	let	f = Field{
 			fFrame = fr,
 			fPanel = p,
@@ -117,13 +132,17 @@ openField = do
 			fActions = acts,
 			fCoordinates = CoordCenter,
 			fPenColor = (0, 0, 0),
+			fSize = sz,
 			fLayers = layers
 		 }
-	set p [on paint := \dc rct -> do
-		act <- readIORef $ fAction f
-		acts <- readIORef $ fActions f
-		mapM_ (($ rct) . ($ dc)) acts
-		act dc rct]
+	set p [	on paint := \dc rct -> do
+			act <- readIORef $ fAction f
+			acts <- readIORef $ fActions f
+			mapM_ (($ rct) . ($ dc)) acts
+			act dc rct,
+		on resize := do
+			Size x y <- get p size
+			writeIORef sz (fromIntegral x, fromIntegral y) ]
 	return f
 
 data InputType = XInput | End | Timer
@@ -173,7 +192,9 @@ drawLine f l w c p q = do
 	where
 	act = \dc rect -> do 
 		set dc [penColor := colorToWX c]
-		line dc (positionToPoint p) (positionToPoint q) []
+		p' <- positionToPoint f p
+		q' <- positionToPoint f q
+		line dc p' q' []
 
 getPenColor :: Field -> WX.Color
 getPenColor Field{fPenColor = (r, g, b)} = rgb r g b
@@ -192,8 +213,10 @@ colorToWX (RGB{colorRed = r, colorGreen = g, colorBlue = b}) = rgb r g b
 	repaint $ fPanel f)
 -}
 
-positionToPoint :: Position -> Point
-positionToPoint (Center x y) = Point (round x + 100) (round y + 100)
+positionToPoint :: Field -> Position -> IO Point
+positionToPoint f (Center x y) = do
+	(sx, sy) <- readIORef $ fSize f
+	return $ Point (round $ x + sx / 2) (round $ y + sy / 2)
 
 writeString :: Field -> Layer -> String -> Double -> Color -> Position ->
 	String -> IO ()
@@ -219,11 +242,14 @@ drawCharacter f ch c ps = do
 drawCharacterAndLine ::	Field -> Character -> Color -> [Position] ->
 	Double -> Position -> Position -> IO ()
 drawCharacterAndLine f ch clr sh lw p q = do
-	putStrLn $ "drawCharacterAndLine" ++ show p ++ " : " ++ show q
+--	putStrLn $ "drawCharacterAndLine" ++ show p ++ " : " ++ show q
 	writeIORef (fAction f) $ \dc rect -> do
 		set dc [brushColor := green, penColor := colorToWX clr ]
-		line dc (positionToPoint p) (positionToPoint q) []
-		polygon dc (map positionToPoint sh) []
+		p' <- positionToPoint f p
+		q' <- positionToPoint f q
+		line dc p' q' []
+		sh' <- mapM (positionToPoint f) sh
+		polygon dc sh' []
 	repaint $ fPanel f
 		
 {-
