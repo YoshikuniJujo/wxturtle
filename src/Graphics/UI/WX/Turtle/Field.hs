@@ -39,6 +39,7 @@ module Graphics.UI.WX.Turtle.Field(
 	clearCharacter,
 
 	-- * event driven
+	oninputtext,
 	onclick,
 	onrelease,
 	ondrag,
@@ -51,7 +52,8 @@ import Graphics.UI.WX(
 	on, command, Prop(..), text, button, frame, layout, widget, set, panel,
 	Frame, Panel, minsize, sz, column, circle, paint, Point2(..), Point,
 	line, repaint, DC, Rect, dcClear, polygon, red, green, brushColor, penColor,
-	rgb, row, textEntry, processEnter, get, fill, size, Size2D(..), resize
+	rgb, row, textEntry, processEnter, get, fill, size, Size2D(..), resize,
+	TextCtrl, penWidth
  )
 import qualified Graphics.UI.WX as WX
 
@@ -91,6 +93,8 @@ data Field = Field{
 
 	fSize :: IORef (Double, Double),
 
+	fInputtext :: IORef (String -> IO Bool),
+
 	fLayers :: IORef Layers
  }
 
@@ -105,11 +109,15 @@ openField = do
 	fr <- frame [text := "turtle"]
 	p <- panel fr []
 	quit <- button fr [text := "Quit", on command := WX.close fr]
+	inputAction <- newIORef $ \_ -> return True
 	rec input <- textEntry fr [
 		processEnter := True,
 		on command := do
-			putStrLn =<< get input text
-			set input [text := ""]]
+			str <- get input text
+			putStrLn str
+			set input [text := ""]
+			cont <- ($ str) =<< readIORef inputAction
+			when (not cont) $ WX.close fr]
 	set fr [layout := column 5 [
 		fill $ minsize (sz 300 300) $ widget p,
 		row 5 [fill $ widget input, widget quit] ]]
@@ -133,7 +141,8 @@ openField = do
 			fCoordinates = CoordCenter,
 			fPenColor = (0, 0, 0),
 			fSize = sz,
-			fLayers = layers
+			fLayers = layers,
+			fInputtext = inputAction
 		 }
 	set p [	on paint := \dc rct -> do
 			act <- readIORef $ fAction f
@@ -191,7 +200,7 @@ drawLine f l w c p q = do
 	repaint $ fPanel f
 	where
 	act = \dc rect -> do 
-		set dc [penColor := colorToWX c]
+		set dc [penColor := colorToWX c, penWidth := round w]
 		p' <- positionToPoint f p
 		q' <- positionToPoint f q
 		line dc p' q' []
@@ -216,7 +225,7 @@ colorToWX (RGB{colorRed = r, colorGreen = g, colorBlue = b}) = rgb r g b
 positionToPoint :: Field -> Position -> IO Point
 positionToPoint f (Center x y) = do
 	(sx, sy) <- readIORef $ fSize f
-	return $ Point (round $ x + sx / 2) (round $ y + sy / 2)
+	return $ Point (round $ x + sx / 2) (round $ - y + sy / 2)
 
 writeString :: Field -> Layer -> String -> Double -> Color -> Position ->
 	String -> IO ()
@@ -229,22 +238,37 @@ fillRectangle :: Field -> Layer -> Position -> Double -> Double -> Color -> IO (
 fillRectangle f l p w h clr = return ()
 
 fillPolygon :: Field -> Layer -> [Position] -> Color -> IO ()
-fillPolygon f l ps clr = return ()
+fillPolygon f l ps clr = do
+	atomicModifyIORef_ (fActions f) $ (act :)
+	repaint $ fPanel f
+	where
+	act = \dc rect -> do
+		set dc [brushColor := green, penColor := colorToWX clr -- ,
+			]
+--			penWidth := round lw]
+		sh' <- mapM (positionToPoint f) ps
+		polygon dc sh' []
 
 --------------------------------------------------------------------------------
 
 addCharacter = makeCharacter . fLayers
 
-drawCharacter :: Field -> Character -> Color -> [Position] -> IO ()
-drawCharacter f ch c ps = do
-	putStrLn "drawCharacter"
+drawCharacter :: Field -> Character -> Color -> [Position] -> Double -> IO ()
+drawCharacter f ch c ps lw = do
+	writeIORef (fAction f) $ \dc rect -> do
+		set dc [brushColor := green, penColor := colorToWX c,
+			penWidth := round lw]
+		sh' <- mapM (positionToPoint f) ps
+		polygon dc sh' []
+	repaint $ fPanel f
 
 drawCharacterAndLine ::	Field -> Character -> Color -> [Position] ->
 	Double -> Position -> Position -> IO ()
 drawCharacterAndLine f ch clr sh lw p q = do
 --	putStrLn $ "drawCharacterAndLine" ++ show p ++ " : " ++ show q
 	writeIORef (fAction f) $ \dc rect -> do
-		set dc [brushColor := green, penColor := colorToWX clr ]
+		set dc [brushColor := green, penColor := colorToWX clr,
+			penWidth := round lw]
 		p' <- positionToPoint f p
 		q' <- positionToPoint f q
 		line dc p' q' []
@@ -263,6 +287,9 @@ clearCharacter :: Character -> IO ()
 clearCharacter ch = character ch $ return ()
 
 --------------------------------------------------------------------------------
+
+oninputtext :: Field -> (String -> IO Bool) -> IO ()
+oninputtext = writeIORef . fInputtext
 
 onclick, onrelease :: Field -> (Int -> Double -> Double -> IO Bool) -> IO ()
 onclick _ _ = return ()

@@ -20,6 +20,7 @@ module Graphics.UI.WX.Turtle.Move(
 	moveTurtle,
 
 	-- * event
+	oninputtext,
 	onclick,
 	onrelease,
 	ondrag,
@@ -36,7 +37,7 @@ import Graphics.UI.WX.Turtle.Field(
 	openField, closeField, waitField, coordinates, topleft, center,
 	fieldSize, forkField, flushField, clearLayer,
 	clearCharacter, addLayer, addCharacter,
-	onclick, onrelease, ondrag, onmotion, onkeypress, ontimer,
+	oninputtext, onclick, onrelease, ondrag, onmotion, onkeypress, ontimer,
 	fieldColor, drawLine, fillRectangle, fillPolygon, writeString,
 	drawImage, undoField, undoLayer, drawCharacter, drawCharacterAndLine)
 import Text.XML.YJSVG(SVG(..), Position(..))
@@ -113,5 +114,5 @@ directions t0 t1 = case directionStep t0 of
 drawTurtle :: Field -> Character -> TurtleState -> Double -> Position ->
 	Maybe Position -> IO ()
 drawTurtle f c ts@TurtleState{pencolor = clr} dir pos = maybe
-	(drawCharacter f c clr $ makeShape ts dir pos)
+	(drawCharacter f c clr (makeShape ts dir pos) (pensize ts))
 	(drawCharacterAndLine f c clr (makeShape ts dir pos) (pensize ts) pos)

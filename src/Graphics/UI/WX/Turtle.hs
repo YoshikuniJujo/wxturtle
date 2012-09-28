@@ -20,6 +20,7 @@ module Graphics.UI.WX.Turtle(
 	center,
 
 	-- ** on events
+	oninputtext,
 	onclick,
 	onrelease,
 	ondrag,
@@ -101,7 +102,7 @@ import Graphics.UI.WX.Turtle.Move(
 	Field, Coordinates(..), openField, closeField, waitField,
 	topleft, center, coordinates, fieldSize, forkField, flushField,
 	addLayer, clearLayer, addCharacter, clearCharacter, moveTurtle,
-	onclick, onrelease, ondrag, onmotion, onkeypress, ontimer)
+	oninputtext, onclick, onrelease, ondrag, onmotion, onkeypress, ontimer)
 import Text.XML.YJSVG(SVG(..), Position(..), Color(..))
 import qualified Text.XML.YJSVG as S(center, topleft)
 
