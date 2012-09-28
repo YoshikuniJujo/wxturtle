@@ -52,7 +52,7 @@ import Graphics.UI.WX(
 	on, command, Prop(..), text, button, frame, layout, widget, set, panel,
 	Frame, Panel, minsize, sz, column, circle, paint, Point2(..), Point,
 	line, repaint, DC, Rect, dcClear, polygon, red, green, brushColor, penColor,
-	rgb, row, textEntry, processEnter, get, fill, size, Size2D(..), resize,
+	rgb, row, textEntry, processEnter, get, hfill, fill, size, Size2D(..), resize,
 	TextCtrl, penWidth
  )
 import qualified Graphics.UI.WX as WX
@@ -120,7 +120,7 @@ openField = do
 			when (not cont) $ WX.close fr]
 	set fr [layout := column 5 [
 		fill $ minsize (sz 300 300) $ widget p,
-		row 5 [fill $ widget input, widget quit] ]]
+		row 5 [hfill $ widget input] ]] -- , widget quit] ]]
 	act <- newIORef $ \dc rct -> circle dc (Point 40 25) 25 []
 	acts <- newIORef []
 	layers <- newLayers 50 (return ())
