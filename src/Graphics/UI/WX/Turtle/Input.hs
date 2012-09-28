@@ -24,6 +24,7 @@ data TurtleInput
 	| Shapesize Double Double
 	| Pensize Double
 	| Pencolor Color
+	| Fillcolor Color
 	| Bgcolor Color
 	| SetPendown Bool
 	| SetVisible Bool
@@ -76,7 +77,8 @@ nextTurtle t (RotateRad dir) = (reset t){direction = dir}
 nextTurtle t@TurtleState{pencolor = clr} (Dot sz) = reset t `set`
 	Just (Rect (position t) sz sz 0 clr clr)
 nextTurtle t@TurtleState{pencolor = clr, fillcolor = fclr} Stamp = reset t `set`
-	Just (Polyline (makeShape t (direction t) (position t)) clr clr 0)
+	Just (Polyline (makeShape t (direction t) (position t)) fclr clr $
+		pensize t)
 nextTurtle t@TurtleState{pencolor = clr} (Write fnt sz str) = reset t `set`
 	Just (Text (position t) sz clr fnt str)
 nextTurtle t (PutImage fp w h) = reset t `set` Just (Image (position t) w h fp)
@@ -88,13 +90,15 @@ nextTurtle t (Shape sh) = (reset t){shape = sh}
 nextTurtle t (Shapesize sx sy) = (reset t){shapesize = (sx, sy)}
 nextTurtle t (Pensize ps) = (reset t){pensize = ps}
 nextTurtle t (Pencolor clr) = (reset t){pencolor = clr}
+nextTurtle t (Fillcolor clr) = (reset t){fillcolor = clr}
 nextTurtle t (Bgcolor clr) = (reset t){
 	draw = Just $ Fill clr, drawed = init (drawed t) ++ [Fill clr]}
 nextTurtle t (SetPendown pd) = (reset t){pendown = pd}
 nextTurtle t (SetVisible v) = (reset t){visible = v}
 nextTurtle t (SetFill fl) = (reset t){fill = fl, fillPoints = [position t | fl]}
 	`set` (if not (fill t) || fl then Nothing else
-		Just $ Polyline (fillPoints t) (pencolor t) (pencolor t) 0)
+		Just $ Polyline (fillPoints t) (fillcolor t) (pencolor t)
+			(pensize t))
 nextTurtle t (SetPoly p) = (reset t){
 	poly = p, polyPoints = if p then [position t] else polyPoints t}
 nextTurtle t (SetFlush ss) = (reset t){stepbystep = ss}

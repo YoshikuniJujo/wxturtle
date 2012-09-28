@@ -74,6 +74,7 @@ module Graphics.UI.WX.Turtle(
 	pendown,
 	pencolor,
 	pensize,
+	fillcolor,
 	radians,
 	degrees,
 	speed,
@@ -274,6 +275,9 @@ pendown = (`input` SetPendown True)
 
 pencolor :: ColorClass c => Turtle -> c -> IO ()
 pencolor t = input t . Pencolor . getColor
+
+fillcolor :: ColorClass c => Turtle -> c -> IO ()
+fillcolor t = input t . Fillcolor . getColor
 
 pensize :: Turtle -> Double -> IO ()
 pensize t = input t . Pensize

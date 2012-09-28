@@ -81,7 +81,7 @@ moveTurtle f c l t0 t1 = do
 drawSVG :: Field -> Layer -> SVG -> IO ()
 drawSVG f l (Line p0 p1 clr lw) = drawLine f l lw clr p0 p1
 drawSVG f l (Rect pos w h 0 fc _) = fillRectangle f l pos w h fc
-drawSVG f l (Polyline ps fc _ 0) = fillPolygon f l ps fc
+drawSVG f l (Polyline ps fc lc lw) = fillPolygon f l ps fc lc lw
 drawSVG f l (Fill clr) = fieldColor f l clr
 drawSVG f l (Text pos sz clr fnt str) = writeString f l fnt sz clr pos str
 drawSVG f l (Image pos w h fp) = drawImage f l fp pos w h
@@ -113,6 +113,6 @@ directions t0 t1 = case directionStep t0 of
 
 drawTurtle :: Field -> Character -> TurtleState -> Double -> Position ->
 	Maybe Position -> IO ()
-drawTurtle f c ts@TurtleState{pencolor = clr} dir pos = maybe
-	(drawCharacter f c clr (makeShape ts dir pos) (pensize ts))
-	(drawCharacterAndLine f c clr (makeShape ts dir pos) (pensize ts) pos)
+drawTurtle f c ts@TurtleState{fillcolor = fclr, pencolor = clr} dir pos = maybe
+	(drawCharacter f c fclr clr (makeShape ts dir pos) (pensize ts))
+	(drawCharacterAndLine f c fclr clr (makeShape ts dir pos) (pensize ts) pos)

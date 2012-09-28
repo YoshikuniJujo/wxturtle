@@ -237,15 +237,14 @@ drawImage f l fp pos w h = return ()
 fillRectangle :: Field -> Layer -> Position -> Double -> Double -> Color -> IO ()
 fillRectangle f l p w h clr = return ()
 
-fillPolygon :: Field -> Layer -> [Position] -> Color -> IO ()
-fillPolygon f l ps clr = do
+fillPolygon :: Field -> Layer -> [Position] -> Color -> Color -> Double -> IO ()
+fillPolygon f l ps clr lc lw = do
 	atomicModifyIORef_ (fActions f) $ (act :)
 	repaint $ fPanel f
 	where
 	act = \dc rect -> do
-		set dc [brushColor := green, penColor := colorToWX clr -- ,
-			]
---			penWidth := round lw]
+		set dc [brushColor := colorToWX clr, penColor := colorToWX lc,
+			penWidth := round lw]
 		sh' <- mapM (positionToPoint f) ps
 		polygon dc sh' []
 
@@ -253,21 +252,21 @@ fillPolygon f l ps clr = do
 
 addCharacter = makeCharacter . fLayers
 
-drawCharacter :: Field -> Character -> Color -> [Position] -> Double -> IO ()
-drawCharacter f ch c ps lw = do
+drawCharacter :: Field -> Character -> Color -> Color -> [Position] -> Double -> IO ()
+drawCharacter f ch fc c ps lw = do
 	writeIORef (fAction f) $ \dc rect -> do
-		set dc [brushColor := green, penColor := colorToWX c,
+		set dc [brushColor := colorToWX fc, penColor := colorToWX c,
 			penWidth := round lw]
 		sh' <- mapM (positionToPoint f) ps
 		polygon dc sh' []
 	repaint $ fPanel f
 
-drawCharacterAndLine ::	Field -> Character -> Color -> [Position] ->
+drawCharacterAndLine ::	Field -> Character -> Color -> Color -> [Position] ->
 	Double -> Position -> Position -> IO ()
-drawCharacterAndLine f ch clr sh lw p q = do
+drawCharacterAndLine f ch fclr clr sh lw p q = do
 --	putStrLn $ "drawCharacterAndLine" ++ show p ++ " : " ++ show q
 	writeIORef (fAction f) $ \dc rect -> do
-		set dc [brushColor := green, penColor := colorToWX clr,
+		set dc [brushColor := colorToWX fclr, penColor := colorToWX clr,
 			penWidth := round lw]
 		p' <- positionToPoint f p
 		q' <- positionToPoint f q
