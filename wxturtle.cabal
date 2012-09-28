@@ -12,7 +12,7 @@ license-file:	LICENSE
 
 category:	Teaching
 synopsis:	turtle like LOGO with wxHaskell
-description:
+description:	turtle like LOGO with wxHaskell
 
 source-repository	head
   type:		git
