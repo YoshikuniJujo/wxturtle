@@ -27,3 +27,7 @@ library
   Other-modules:	Graphics.UI.WX.Turtle.Field, Graphics.UI.WX.Turtle.Input,
     Graphics.UI.WX.Turtle.Move, Graphics.UI.WX.Turtle.State,
     Graphics.UI.WX.Turtle.Data, Graphics.UI.WX.Turtle.Layers
+
+executable		testTurtle
+  Hs-source-dirs:	tests, src
+  Main-is:		testWX.hs
