@@ -1,4 +1,4 @@
-{-# LANGUAGE DoRec #-}
+{-# LANGUAGE RecursiveDo #-}
 
 module Graphics.UI.WX.Turtle.Field(
 	-- * types and classes
@@ -61,7 +61,7 @@ import Graphics.UI.WX.Turtle.Layers(
 	Layers, Layer, Character, newLayers, redrawLayers,
 	makeLayer, background, addDraw, undoLayer, clearLayer,
 	makeCharacter, character)
-import Text.XML.YJSVG(Position(..), Color(..))
+import Text.XML.YJSVG(Position(..), Color(..), Font(..))
 
 import Control.Monad(when, unless, forever, replicateM, forM_, join)
 import Control.Monad.Tools(doWhile_, doWhile)
@@ -227,7 +227,7 @@ positionToPoint f (Center x y) = do
 	(sx, sy) <- readIORef $ fSize f
 	return $ Point (round $ x + sx / 2) (round $ - y + sy / 2)
 
-writeString :: Field -> Layer -> String -> Double -> Color -> Position ->
+writeString :: Field -> Layer -> Font -> Double -> Color -> Position ->
 	String -> IO ()
 writeString f l fname size clr pos str = return ()
 

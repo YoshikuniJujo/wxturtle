@@ -40,7 +40,7 @@ import Graphics.UI.WX.Turtle.Field(
 	oninputtext, onclick, onrelease, ondrag, onmotion, onkeypress, ontimer,
 	fieldColor, drawLine, fillRectangle, fillPolygon, writeString,
 	drawImage, undoField, undoLayer, drawCharacter, drawCharacterAndLine)
-import Text.XML.YJSVG(SVG(..), Position(..))
+import Text.XML.YJSVG(SVG(..), Position(..), Font(..), FontWeight(..))
 import qualified Text.XML.YJSVG as S(topleft)
 
 import Control.Concurrent(threadDelay)
